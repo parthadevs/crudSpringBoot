@@ -25,7 +25,7 @@ A simple and robust CRUD (Create, Read, Update, Delete) application built with *
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/parthadevs/crudSpringBoot.git
    cd crudSpringBoot
    ```
 
@@ -65,7 +65,7 @@ A simple and robust CRUD (Create, Read, Update, Delete) application built with *
 | :--- | :--- | :--- | :--- |
 | **Get All** | `GET` | `/api/students` | Retrieve list of all students |
 | **Get By ID** | `GET` | `/api/students/{id}` | Retrieve a single student by ID |
-| **Create** | `POST` | `/api/students` | Create a new student record |
+| **Create** | `POST` | `/api/students/create` | Create a new student record |
 | **Update** | `PUT` | `/api/students/{id}` | Update an existing student |
 | **Delete** | `DELETE` | `/api/students/{id}` | Delete a student record |
 
