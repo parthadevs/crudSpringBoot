@@ -1,8 +1,14 @@
 package io.github.parthadevs.crudSpringBoot.service;
 
+import io.github.parthadevs.crudSpringBoot.dto.StudentRequestDto;
+import io.github.parthadevs.crudSpringBoot.dto.StudentResponceDto;
+import io.github.parthadevs.crudSpringBoot.dto.UpdateStudentRequestDto;
+import io.github.parthadevs.crudSpringBoot.dto.UpdateStudentResponceDto;
 import io.github.parthadevs.crudSpringBoot.entity.Student;
 import io.github.parthadevs.crudSpringBoot.repository.StudentRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,58 +21,104 @@ public class StudentService {
     }
 
     // create student
-    public Student createStudent(Student student) {
+    public StudentResponceDto createStudent(StudentRequestDto studentRequestDto) {
+        Student student = mapToEntity(studentRequestDto);
         boolean isEmailExists = this.studentRepository.existsByEmail(student.getEmail());
         if (isEmailExists) {
             throw new RuntimeException("Student with email '" + student.getEmail() + "' already exists!");
         }
+        student.setCreatedAt(LocalDateTime.now());
+        student.setUpdatedAt(LocalDateTime.now());
         student.setDeleted(false);
-        return this.studentRepository.save(student);
+        Student studentRes = this.studentRepository.save(student);
+        return mapToDto(studentRes);
     }
 
-    // get student by id
-    public Student getStudentById(Long id) {
-        return this.studentRepository.findByIdAndDeletedIsFalse(id)
+    // get student by id (With Exception Handling)
+    public StudentResponceDto getStudentById(Long id) {
+        Student student = this.studentRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        return mapToDto(student);
     }
 
-    // get all students
-    public List<Student> getAllStudent() {
-        return this.studentRepository.findAllByDeletedIsFalse();
+    // get all active students (Soft delete checked)
+    public List<StudentResponceDto> getAllStudent() {
+        List<Student> studentslist = this.studentRepository.findAllByDeletedIsFalse();
+        return studentslist.stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     // update student
-    public Student updateStudent(Long id, Student student) {
-        Student studentRes = this.studentRepository.findByIdAndDeletedIsFalse(id)
+    public UpdateStudentResponceDto updateStudent(Long id, UpdateStudentRequestDto updateStudentRequestDto) {
+        Student existingStudent = this.studentRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
 
-        // Update all relevant fields
-        studentRes.setName(student.getName());
-        studentRes.setEmail(student.getEmail());
-        studentRes.setAge(student.getAge());
-        studentRes.setRollNo(student.getRollNo());
-        studentRes.setSubject(student.getSubject());
+        existingStudent.setName(updateStudentRequestDto.getName());
+        existingStudent.setAge(updateStudentRequestDto.getAge());
+        existingStudent.setRollNo(updateStudentRequestDto.getRollNo());
+        existingStudent.setSubject(updateStudentRequestDto.getSubject());
+        existingStudent.setUpdatedAt(LocalDateTime.now());
 
-        // Save and return updated entity
-        return this.studentRepository.save(studentRes);
+        Student updatedStudent = this.studentRepository.save(existingStudent);
+        return mapToUpdateDto(updatedStudent);
     }
 
     // delete student (Hard delete)
     public boolean deleteStudentById(Long id) {
-        if (!this.studentRepository.existsById(id)) return false;
+        if (!this.studentRepository.existsById(id)) {
+            throw new RuntimeException("Student not found with id: " + id);
+        }
         this.studentRepository.deleteById(id);
         return true;
     }
 
     // delete student (Soft delete)
     public boolean deleteStudentSofrly(Long id) {
-        Optional<Student> existingStudent = this.studentRepository.findByIdAndDeletedIsFalse(id);
-        if (existingStudent.isEmpty()){
-            return false;
-        }
-        Student studentToSave = existingStudent.get();
-        studentToSave.setDeleted(true);
-        this.studentRepository.save(studentToSave);
+        Student existingStudent = this.studentRepository.findByIdAndDeletedIsFalse(id)
+                .orElseThrow(() -> new RuntimeException("Student not found or already deleted with id: " + id));
+
+        existingStudent.setDeleted(true);
+        existingStudent.setUpdatedAt(LocalDateTime.now());
+        this.studentRepository.save(existingStudent);
         return true;
+    }
+
+    // Mapper Helpers
+    private Student mapToEntity(StudentRequestDto studentRequestDto) {
+        Student student = new Student();
+        student.setName(studentRequestDto.getName());
+        student.setEmail(studentRequestDto.getEmail());
+        student.setAge(studentRequestDto.getAge());
+        student.setRollNo(studentRequestDto.getRollNo());
+        student.setSubject(studentRequestDto.getSubject());
+        return student;
+    }
+
+    private StudentResponceDto mapToDto(Student student) {
+        StudentResponceDto studentResponceDto = new StudentResponceDto();
+        studentResponceDto.setId(student.getId());
+        studentResponceDto.setName(student.getName());
+        studentResponceDto.setEmail(student.getEmail());
+        studentResponceDto.setAge(student.getAge());
+        studentResponceDto.setRollNo(student.getRollNo());
+        studentResponceDto.setSubject(student.getSubject());
+        studentResponceDto.setCreatedAt(student.getCreatedAt());
+        studentResponceDto.setUpdatedAt(student.getUpdatedAt());
+        studentResponceDto.setMessage("Student Retrieved Successfully");
+        return studentResponceDto;
+    }
+
+    private UpdateStudentResponceDto mapToUpdateDto(Student student) {
+        UpdateStudentResponceDto responseDto = new UpdateStudentResponceDto();
+        responseDto.setId(student.getId());
+        responseDto.setName(student.getName());
+        responseDto.setEmail(student.getEmail());
+        responseDto.setAge(student.getAge());
+        responseDto.setRollNo(student.getRollNo());
+        responseDto.setSubject(student.getSubject());
+        responseDto.setUpdatedAt(student.getUpdatedAt());
+        responseDto.setMessage("Student Updated Successfully");
+        return responseDto;
     }
 }

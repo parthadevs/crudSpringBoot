@@ -1,25 +1,28 @@
 # CRUD Spring Boot Project (crudSpringBoot)
 
-A robust and feature-rich CRUD (Create, Read, Update, Delete) application built with **Spring Boot**, **Spring Data JPA**, and **MySQL**. This project is designed to manage student records efficiently with advanced features like email validation and soft delete support.
+A robust, enterprise-grade, and feature-rich CRUD (Create, Read, Update, Delete) application built with **Spring Boot**, **Spring Data JPA**, and **MySQL**. This project is designed to manage student records efficiently following clean architecture principles like **DTO pattern**, **Bean Validation**, and **Centralized Exception Handling**.
 
 ---
 
 ## Features
-- **Create**: Add new student records with built-in **email duplicity validation**.
-- **Read**: Fetch all active students or find a specific student by ID.
-- **Update**: Modify existing student information securely.
-- **Soft Delete**: Mark student records as deleted without removing them permanently from the database.
-- **Hard Delete**: Permanently remove a student record from the database.
+- **DTO Pattern Architecture**: Clean separation of concerns using Request and Response DTOs (`StudentRequestDto`, `StudentResponceDto`, etc.).
+- **Request Validation**: Integrated `jakarta.validation` constraints (`@NotBlank`, `@Email`, `@Min`, `@NotNull`) to ensure robust data integrity.
+- **Email Duplicity Check**: Prevents duplicate student registrations with the same email address (returns `409 Conflict`).
+- **Global Exception Handling**: Centralized error management using `@RestControllerAdvice` providing standardized JSON error responses.
+- **Active Records Fetching**: Fetch all active students or find a specific student by ID while filtering out soft-deleted records.
+- **Soft Delete**: Mark student records as deleted (`deleted = true`) without removing them permanently from the database.
+- **Hard Delete**: Permanently remove a student record from the database when needed.
+- **Timestamp Tracking**: Automatic tracking of record creation and modification times (`createdAt`, `updatedAt`).
 
 ---
 
 ## Tech Stack
-- **Language**: Java
-- **Framework**: Spring Boot
+- **Language**: Java 17+
+- **Framework**: Spring Boot 3+ (or 7+ depending on modules)
 - **ORM**: Spring Data JPA / Hibernate
 - **Database**: MySQL
+- **Validation**: Jakarta Bean Validation
 - **Build Tool**: Maven / Gradle
-
 ---
 
 ## Configuration & Setup
