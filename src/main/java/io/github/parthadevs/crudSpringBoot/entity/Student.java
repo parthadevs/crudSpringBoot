@@ -17,7 +17,10 @@ public class Student {
     private String email;
     private int rollNo;
     private String subject;
+    private boolean deleted;
 
+    public boolean isDeleted() { return deleted;}
+    public void setDeleted(boolean deleted) {this.deleted = deleted;}
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }

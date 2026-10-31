@@ -4,6 +4,7 @@ import io.github.parthadevs.crudSpringBoot.entity.Student;
 import io.github.parthadevs.crudSpringBoot.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -19,24 +20,24 @@ public class StudentService {
         if (isEmailExists) {
             throw new RuntimeException("Student with email '" + student.getEmail() + "' already exists!");
         }
+        student.setDeleted(false);
         return this.studentRepository.save(student);
     }
 
     // get student by id
     public Student getStudentById(Long id) {
-        return this.studentRepository.findById(id)
+        return this.studentRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
     }
 
     // get all students
     public List<Student> getAllStudent() {
-        return this.studentRepository.findAll();
+        return this.studentRepository.findAllByDeletedIsFalse();
     }
 
     // update student
     public Student updateStudent(Long id, Student student) {
-        // Check if student exists, else throw clean exception
-        Student studentRes = this.studentRepository.findById(id)
+        Student studentRes = this.studentRepository.findByIdAndDeletedIsFalse(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
 
         // Update all relevant fields
@@ -50,11 +51,22 @@ public class StudentService {
         return this.studentRepository.save(studentRes);
     }
 
-    // delete student
-    public void deleteStudentById(Long id) {
-        if (!this.studentRepository.existsById(id)) {
-            throw new RuntimeException("Student not found with id: " + id);
-        }
+    // delete student (Hard delete)
+    public boolean deleteStudentById(Long id) {
+        if (!this.studentRepository.existsById(id)) return false;
         this.studentRepository.deleteById(id);
+        return true;
+    }
+
+    // delete student (Soft delete)
+    public boolean deleteStudentSofrly(Long id) {
+        Optional<Student> existingStudent = this.studentRepository.findByIdAndDeletedIsFalse(id);
+        if (existingStudent.isEmpty()){
+            return false;
+        }
+        Student studentToSave = existingStudent.get();
+        studentToSave.setDeleted(true);
+        this.studentRepository.save(studentToSave);
+        return true;
     }
 }

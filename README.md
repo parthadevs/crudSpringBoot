@@ -1,23 +1,24 @@
 # CRUD Spring Boot Project (crudSpringBoot)
 
-A simple and robust CRUD (Create, Read, Update, Delete) application built with **Spring Boot**, **Spring Data JPA**, and **MySQL**. This project is designed to manage student records efficiently.
+A robust and feature-rich CRUD (Create, Read, Update, Delete) application built with **Spring Boot**, **Spring Data JPA**, and **MySQL**. This project is designed to manage student records efficiently with advanced features like email validation and soft delete support.
 
 ---
 
 ## Features
-* **Create**: Add new student records.
-* **Read**: Fetch all students or find a specific student by ID.
-* **Update**: Modify existing student information.
-* **Delete**: Remove a student record from the database.
+- **Create**: Add new student records with built-in **email duplicity validation**.
+- **Read**: Fetch all active students or find a specific student by ID.
+- **Update**: Modify existing student information securely.
+- **Soft Delete**: Mark student records as deleted without removing them permanently from the database.
+- **Hard Delete**: Permanently remove a student record from the database.
 
 ---
 
 ## Tech Stack
-* **Language**: Java
-* **Framework**: Spring Boot
-* **ORM**: Spring Data JPA / Hibernate
-* **Database**: MySQL
-* **Build Tool**: Maven / Gradle
+- **Language**: Java
+- **Framework**: Spring Boot
+- **ORM**: Spring Data JPA / Hibernate
+- **Database**: MySQL
+- **Build Tool**: Maven / Gradle
 
 ---
 
@@ -63,11 +64,12 @@ A simple and robust CRUD (Create, Read, Update, Delete) application built with *
 
 | Operation | HTTP Method | Endpoint | Description |
 | :--- | :--- | :--- | :--- |
-| **Get All** | `GET` | `/api/students` | Retrieve list of all students |
+| **Get All** | `GET` | `/api/students` | Retrieve list of all active students |
 | **Get By ID** | `GET` | `/api/students/{id}` | Retrieve a single student by ID |
-| **Create** | `POST` | `/api/students/create` | Create a new student record |
-| **Update** | `PUT` | `/api/students/{id}` | Update an existing student |
-| **Delete** | `DELETE` | `/api/students/{id}` | Delete a student record |
+| **Create** | `POST` | `/api/students/create` | Create a new student (Checks email uniqueness) |
+| **Update** | `PUT` | `/api/students/update/{id}` | Update an existing student record |
+| **Soft Delete** | `PATCH` | `/api/students/soft-delete/{id}` | Mark a student as deleted (Soft delete) |
+| **Hard Delete** | `DELETE` | `/api/students/delete/{id}` | Permanently delete a student record |
 
 ---
 
